@@ -5,10 +5,11 @@ set -x
 set -e
 
 export WORKSPACE=$HOME/zvm-toolchain  # Root working directory
-export GITURL=$2        # example: "https://github.com/zerovm"
+export GITURL=$1        # example: "https://github.com/zerovm"
+export TOOLCHAIN_BRANCH=$2     # branch of the toolchain to build
 
 # Pull the main source repo:
-git clone $GITURL/toolchain.git $WORKSPACE
+git clone -b $TOOLCHAIN_BRANCH $GITURL/toolchain.git $WORKSPACE
 
 # NOTE: the following one-time setup steps are required:
 ## add custom repo for zeromq libs (libzmq3-dev):
