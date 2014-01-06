@@ -14,7 +14,7 @@ CURRENT_JOB_ID=$JOB_NAME-$BUILD_NUMBER
 IP=""
 
 get_ip () {
-    IP=`cat /var/lib/misc/dnsmasq.leases | grep "\s$CURRENT_JOB_ID\s" | awk '{print $3}'`
+    export IP=`cat /var/lib/misc/dnsmasq.leases | grep "\s$CURRENT_JOB_ID\s" | awk '{print $3}'`
 }
 
 # clone an lxc container
