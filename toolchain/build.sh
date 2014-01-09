@@ -23,15 +23,14 @@ git clone --recursive -b $TOOLCHAIN_BRANCH $GITURL/toolchain.git $WORKSPACE
 # export OTHER_LIBS="$WORKSPACE/other_libs"
 
 # set env vars:
-# export ZEROVM_ROOT=$OTHER_LIBS/zerovm
-# export ZVM_PREFIX=$OTHER_LIBS/zvm-root
-# export ZRT_ROOT=$OTHER_LIBS/zrt
-# export PATH=$ZVM_PREFIX/bin:$PATH
+export ZVM_PREFIX=$HOME/zerovm
+export ZRT_ROOT=$HOME/zrt
+# We need headers from zrt:
+git clone $GITURL/zrt.git $ZRT_ROOT
 
 # build toolchain:
 cd $WORKSPACE
 # cd $OTHER_LIBS/zvm-toolchain
 echo "Building toolchain..."
 make -j8
-echo "Make exited with $?"
-exit 0
+

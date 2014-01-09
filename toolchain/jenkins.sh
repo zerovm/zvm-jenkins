@@ -1,8 +1,10 @@
 #!/bin/bash
 
-# GITURL needs to be set
-# RAWGITURL needs to be set
-
+# The following variables need to be set:
+# - GITURL
+# - RAWGITURL
+# - LOCAL_PKG_DIR
+# - REMOTE_PKG_REPO_DIR
 
 echo "Fetching package dependenices, publishing to local pkg repo..."
 scp -oStrictHostKeyChecking=no $LOCAL_PKG_DIR/*.deb ubuntu@$IP:$REMOTE_PKG_REPO_DIR
@@ -17,8 +19,8 @@ ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./build.sh"
 echo "Running build script. This could take a while..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "./build.sh $GITURL $BRANCH"
 
-echo "Deploying test script..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget $RAWGITURL/zvm-jenkins/master/toolchain/test.sh"
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./test.sh"
-echo "Running tests..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "sh test.sh"
+#echo "Deploying test script..."
+#ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget $RAWGITURL/zvm-jenkins/master/toolchain/test.sh"
+#ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./test.sh"
+#echo "Running tests..."
+#ssh ubuntu@$IP -oStrictHostKeyChecking=no "sh test.sh"
