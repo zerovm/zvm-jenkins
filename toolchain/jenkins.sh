@@ -3,49 +3,22 @@
 # GITURL needs to be set
 # RAWGITURL needs to be set
 
-CURRENT_JOB_ID=$JOB_NAME-$BUILD_NUMBER
-IP=""
 
-get_ip () {
-    IP=`cat /var/lib/misc/dnsmasq.leases | grep "\s$CURRENT_JOB_ID\s" | awk '{print $3}'`
-}
-
-# clone an lxc container
-sudo lxc-clone -o $JOB_NAME -n $CURRENT_JOB_ID
-# start lxc, daemonized
-sudo lxc-start -n $CURRENT_JOB_ID -d
-
-# get the IP of the machine
-get_ip
-
-if [ -z "${IP}" ]; then
-    # it may take some time for the IP lease to take effect,
-    # so we can try multiple times before failing
-    times=(1 2 4 8)
-    for t in "${times[@]}"; do
-        echo "No IP yet assigned to LXC $CURRENT_JOB_ID -- waiting for $t seconds"
-        sleep $t
-        get_ip
-        if [ -z "${IP}" ]; then
-            # not yet defined
-            continue
-        else
-            break
-        fi
-    done
-fi
-
-if [ -z "${IP}" ]; then
-    echo "The LXC has did not get an IP"
-    exit 1
-fi
+echo "Fetching package dependenices, publishing to local pkg repo..."
+scp -oStrictHostKeyChecking=no $LOCAL_PKG_DIR/*.deb ubuntu@$IP:$REMOTE_PKG_REPO_DIR
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "./update-mydebs.sh $REMOTE_PKG_REPO_DIR"
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get update"
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get install --yes --force-yes zerovm-zmq-dev"
 
 # run the build script remotely in the LXC
-ssh ubuntu@$IP "wget $RAWGITURL/zvm-jenkins/master/build-zvm-toolchain.sh"
-ssh ubuntu@$IP "./build-zvm-toolchain.sh $WORKSPACE $GITURL"
+echo "Deploying build script..."
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget $RAWGITURL/zvm-jenkins/master/toolchain/build.sh"
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./build.sh"
+echo "Running build script. This could take a while..."
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "./build.sh $GITURL $BRANCH"
 
-# stop lxc
-sudo lxc-stop -n $CURRENT_JOB_ID
-# destroy lxc
-sudo lxc-destroy -n $CURRENT_JOB_ID
-echo "Build complete!"
+echo "Deploying test script..."
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget $RAWGITURL/zvm-jenkins/master/toolchain/test.sh"
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./test.sh"
+echo "Running tests..."
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "sh test.sh"
