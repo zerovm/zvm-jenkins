@@ -9,7 +9,7 @@ export GITURL=$1        # example: "https://github.com/zerovm"
 export TOOLCHAIN_BRANCH=$2     # branch of the toolchain to build
 
 # Pull the main source repo:
-git clone -b $TOOLCHAIN_BRANCH $GITURL/toolchain.git $WORKSPACE
+git clone --recursive -b $TOOLCHAIN_BRANCH $GITURL/toolchain.git $WORKSPACE
 
 # NOTE: the following one-time setup steps are required:
 ## add custom repo for zeromq libs (libzmq3-dev):
@@ -20,40 +20,13 @@ git clone -b $TOOLCHAIN_BRANCH $GITURL/toolchain.git $WORKSPACE
 # sudo apt-get install libc6-dev-i386 libglib2.0-dev pkg-config git libzmq3-dev build-essential automake autoconf libtool g++-multilib texinfo subversion lzma
 
 # a place to clone deps from git:
-export OTHER_LIBS="$WORKSPACE/other_libs"
+# export OTHER_LIBS="$WORKSPACE/other_libs"
 
 # set env vars:
-export ZEROVM_ROOT=$OTHER_LIBS/zerovm
-export ZVM_PREFIX=$OTHER_LIBS/zvm-root
-export ZRT_ROOT=$OTHER_LIBS/zrt
-export PATH=$ZVM_PREFIX/bin:$PATH
-
-# get "submodules" of the toolchain:
-cd $WORKSPACE/SRC
-git clone $GITURL/linux-headers-for-nacl.git
-git clone $GITURL/gcc.git
-git clone $GITURL/glibc.git
-git clone $GITURL/newlib.git
-git clone $GITURL/binutils.git
-
-# clone other stuff:
-git clone $GITURL/zerovm.git $ZEROVM_ROOT
-git clone $GITURL/validator.git $ZEROVM_ROOT/valz
-git clone $GITURL/zrt.git $ZRT_ROOT
-
-# make the validator lib available to compile zerovm:
-cd $ZEROVM_ROOT/valz
-make validator
-ln -s ./out/Release/libvalidator.so.0.9.0 libvalidator.so.0.9.0
-ln -s ./out/Release/libvalidator.so.0.9.0 libvalidator.so.0
-ln -s ./out/Release/libvalidator.so.0.9.0 libvalidator.so
-export LIBRARY_PATH="`pwd`"
-export PATH="`pwd`:$PATH"
-export LD_LIBRARY_PATH="`pwd`"
-
-# build zerovm:
-cd $ZEROVM_ROOT
-make all install PREFIX=$ZVM_PREFIX
+# export ZEROVM_ROOT=$OTHER_LIBS/zerovm
+# export ZVM_PREFIX=$OTHER_LIBS/zvm-root
+# export ZRT_ROOT=$OTHER_LIBS/zrt
+# export PATH=$ZVM_PREFIX/bin:$PATH
 
 # build toolchain:
 cd $WORKSPACE
