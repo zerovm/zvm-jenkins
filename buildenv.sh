@@ -3,6 +3,7 @@
 set -x
 set -e
 
+LXC_TEMPLATE="zvm"
 # TODO: Add a real check for these
 # The following env vars should be set:
 # - JOB_NAME (set by jenkins)
@@ -18,7 +19,7 @@ get_ip () {
 }
 
 # clone an lxc container
-sudo lxc-clone -o $JOB_NAME -n $CURRENT_JOB_ID
+sudo lxc-clone -o $LXC_TEMPLATE -n $CURRENT_JOB_ID
 # start lxc, daemonized
 sudo lxc-start -n $CURRENT_JOB_ID -d
 
