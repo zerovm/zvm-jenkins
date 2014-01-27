@@ -11,6 +11,8 @@ set -e
 # - LOCAL_PKG_DIR
 
 
+echo "Installing wget..."
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get install --yes --force-yes wget"
 echo "Fetching package dependencies, publishing to local pkg repo..."
 # TODO: Revise this--don't copy all packages, just the ones we need
 # NOTE: The package file name can change from version to version
