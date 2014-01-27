@@ -6,7 +6,7 @@ export WORKSPACE=$HOME/validator
 export GITURL=$1
 export BRANCH=$2
 
-DEPS="git make"
+DEPS="git gcc make g++-multilib devscripts debhelper"
 sudo apt-get update
 sudo apt-get install --yes --force-yes $DEPS
 
