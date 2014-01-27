@@ -10,4 +10,3 @@ cd $WORKSPACE
 git archive HEAD --output ../zerovm-zmq_0.9.4.orig.tar
 gzip ../zerovm-zmq_0.9.4.orig.tar
 debuild -us -uc --source-option=--include-binaries
-

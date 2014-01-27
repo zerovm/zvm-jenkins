@@ -16,16 +16,14 @@ ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get install --yes --force-ye
 echo "Fetching package dependencies, publishing to local pkg repo..."
 # TODO: Revise this--don't copy all packages, just the ones we need
 # NOTE: The package file name can change from version to version
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "mkdir $REMOTE_PKG_REPO_DIR"
 scp -oStrictHostKeyChecking=no $LOCAL_PKG_DIR/*.deb ubuntu@$IP:$REMOTE_PKG_REPO_DIR
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "./update-mydebs.sh $REMOTE_PKG_REPO_DIR"
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get update"
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get install --yes --force-yes libvalidator0"
 
 echo "Deploying build script..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget $RAWGITURL/zvm-jenkins/master/zerovm/build.sh"
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./build.sh"
 echo "Running build script..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "./build.sh $GITURL $BRANCH"
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "./build.sh $GITURL $BRANCH $REMOTE_PKG_REPO_DIR"
 
 echo "Deploying packaging script..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget $RAWGITURL/zvm-jenkins/master/zerovm/package.sh"
