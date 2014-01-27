@@ -11,11 +11,11 @@ sudo apt-get update
 # need this to run a local pkg repo
 sudo apt-get install --yes --force-yes dpkg-dev
 
+echo "deb file:$REMOTE_PKG_REPO_DIR ./" | sudo tee -a /etc/apt/sources.list
 # scan for packages in the local package repo
 cd $REMOTE_PKG_REPO_DIR
 dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
-
-echo $REMOTE_PKG_REPO_DIR | sudo tee -a /etc/apt/sources.list
+sudo apt-get update
 
 # Install deps
 DEPS="git gcc make g++-multilib devscripts debhelper libvalidator0"
