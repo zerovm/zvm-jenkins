@@ -10,7 +10,8 @@ set -e
 # - RAWGITURL
 # - LOCAL_PKG_DIR
 
-
+echo "Installing wget..."
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get install --yes --force-yes wget"
 echo "Deploying build script..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget $RAWGITURL/zvm-jenkins/master/validator/build.sh"
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./build.sh"
