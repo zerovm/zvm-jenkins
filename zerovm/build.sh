@@ -15,7 +15,7 @@ sudo apt-get install --yes --force-yes dpkg-dev
 cd $REMOTE_PKG_REPO_DIR
 dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
 
-sudo echo $REMOTE_PKG_REPO_DIR >> /etc/apt/sources.list
+echo $REMOTE_PKG_REPO_DIR | sudo tee -a /etc/apt/sources.list
 
 # Install deps
 DEPS="git gcc make g++-multilib devscripts debhelper libvalidator0"
