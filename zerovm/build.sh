@@ -12,13 +12,15 @@ sudo apt-get update
 sudo apt-get install --yes --force-yes dpkg-dev
 
 echo "deb file:$REMOTE_PKG_REPO_DIR ./" | sudo tee -a /etc/apt/sources.list
-# scan for packages in the local package repo
 cd $REMOTE_PKG_REPO_DIR
 dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
+sudo su -c 'echo "deb [ arch=amd64 ] http://zvm.rackspace.com/v1/repo/ubuntu/ precise main" > /etc/apt/sources.list.d/zerovm-precise.list'
+wget -O- https://zvm.rackspace.com/v1/repo/ubuntu/zerovm.pkg.key | sudo apt-key add -
 sudo apt-get update
 
 # Install deps
-DEPS="git gcc make g++-multilib devscripts debhelper libvalidator0"
+DEPS="git gcc make g++-multilib pkg-config libglib2.0-dev devscripts debhelper"
+DEPS="$DEPS libvalidator0 libzmq3-dev"
 sudo apt-get install --yes --force-yes $DEPS
 
 # Clone and build
