@@ -1,36 +1,45 @@
 #!/bin/bash
 # Jenkins build/test script for the zvm-toolchain
-# See https://github.com/zerovm/toolchain
+# See $GITURL/toolchain
 set -x
 set -e
 
 export WORKSPACE=$HOME/zvm-toolchain  # Root working directory
-export GITURL=$1        # example: "https://github.com/zerovm"
-export TOOLCHAIN_BRANCH=$2     # branch of the toolchain to build
+export GITURL=$1                      # example: "$GITURL"
+export TOOLCHAIN_BRANCH=$2            # branch of the toolchain to build
+export REMOTE_PKG_REPO_DIR=$3
 
-# Pull the main source repo:
-git clone --recursive -b $TOOLCHAIN_BRANCH $GITURL/toolchain.git $WORKSPACE
+sudo apt-get update
+sudo apt-get install --yes --force-yes dpkg-dev
 
-# NOTE: the following one-time setup steps are required:
-## add custom repo for zeromq libs (libzmq3-dev):
-# sudo su -c 'echo "deb [ arch=amd64 ] http://zvm.rackspace.com/v1/repo/ubuntu/ precise main" > /etc/apt/sources.list.d/zerovm-precise.list'
-# wget -O- https://zvm.rackspace.com/v1/repo/ubuntu/zerovm.pkg.key | sudo apt-key add -
-## install packages:
-# sudo apt-get update
-# sudo apt-get install libc6-dev-i386 libglib2.0-dev pkg-config git libzmq3-dev build-essential automake autoconf libtool g++-multilib texinfo subversion lzma
+echo "deb file:$REMOTE_PKG_REPO_DIR ./" | sudo tee -a /etc/apt/sources.list
+cd $REMOTE_PKG_REPO_DIR
+dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
+sudo apt-get update
+# We need to install this first before adding the ZVM repo,
+# so that we can install the local/latest version
+sudo apt-get install --yes --force-yes zerovm-zmq zerovm-zmq-dev
+sudo su -c 'echo "deb [ arch=amd64 ] http://zvm.rackspace.com/v1/repo/ubuntu/ precise main" > /etc/apt/sources.list.d/zerovm-precise.list'
+wget -O- https://zvm.rackspace.com/v1/repo/ubuntu/zerovm.pkg.key | sudo apt-key add -
+sudo apt-get update
 
-# a place to clone deps from git:
-# export OTHER_LIBS="$WORKSPACE/other_libs"
+# install package deps
+DEPS="git libc6-dev-i386 libglib2.0-dev pkg-config build-essential automake"
+DEPS="$DEPS autoconf libtool g++-multilib texinfo flex bison groff gperf"
+DEPS="$DEPS texinfo subversion libzmq3 libzmq3-dev"
+sudo apt-get install --yes --force-yes $DEPS
 
-# set env vars:
-export ZVM_PREFIX=$HOME/zerovm
+# we need zrt to build the toolchain
 export ZRT_ROOT=$HOME/zrt
-# We need headers from zrt:
 git clone $GITURL/zrt.git $ZRT_ROOT
-
-# build toolchain:
+# Pull the main source repo:
+git clone -b $TOOLCHAIN_BRANCH $GITURL/toolchain.git $WORKSPACE
+cd $WORKSPACE/SRC
+git clone $GITURL/linux-headers-for-nacl.git
+git clone $GITURL/gcc.git
+git clone $GITURL/glibc.git
+git clone $GITURL/newlib.git
+git clone $GITURL/binutils.git
 cd $WORKSPACE
-# cd $OTHER_LIBS/zvm-toolchain
 echo "Building toolchain..."
 make -j8
-

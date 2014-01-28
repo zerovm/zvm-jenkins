@@ -1,26 +1,26 @@
 #!/bin/bash
-
+set -x
+set -e
 # The following variables need to be set:
+# - IP
 # - GITURL
 # - RAWGITURL
 # - LOCAL_PKG_DIR
 # - REMOTE_PKG_REPO_DIR
 
-echo "Fetching package dependenices, publishing to local pkg repo..."
-scp -oStrictHostKeyChecking=no $LOCAL_PKG_DIR/*.deb ubuntu@$IP:$REMOTE_PKG_REPO_DIR
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "./update-mydebs.sh $REMOTE_PKG_REPO_DIR"
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get update"
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get install --yes --force-yes zerovm-zmq-dev"
 
-# run the build script remotely in the LXC
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get update"
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get install --yes --force-yes wget"
+
+echo "Deploying packages..."
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "mkdir $REMOTE_PKG_REPO_DIR"
+scp -oStrictHostKeyChecking=no $LOCAL_PKG_DIR/*.deb ubuntu@$IP:$REMOTE_PKG_REPO_DIR
+
 echo "Deploying build script..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget $RAWGITURL/zvm-jenkins/master/toolchain/build.sh"
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./build.sh"
 echo "Running build script. This could take a while..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "./build.sh $GITURL $BRANCH"
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "./build.sh $GITURL $BRANCH $REMOTE_PKG_REPO_DIR"
 
-#echo "Deploying test script..."
-#ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget $RAWGITURL/zvm-jenkins/master/toolchain/test.sh"
-#ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./test.sh"
-#echo "Running tests..."
-#ssh ubuntu@$IP -oStrictHostKeyChecking=no "sh test.sh"
+# TODO: deploy/run test script
+# TODO: deploy/run package script
