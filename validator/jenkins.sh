@@ -26,5 +26,5 @@ ssh ubuntu@$IP -oStrictHostKeyChecking=no "./package.sh"
 
 # Copy the built package to the host machine,
 # so that other build jobs can use it.
-echo "Copying built deb package..."
-scp ubuntu@$IP:/home/ubuntu/*.deb $LOCAL_PKG_DIR
+# echo "Copying built deb package..."
+# scp ubuntu@$IP:/home/ubuntu/*.deb $LOCAL_PKG_DIR
