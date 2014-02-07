@@ -22,7 +22,7 @@ echo "Deploying packaging script..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/validator/package.sh"
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./package.sh"
 echo "Creating packages..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "./package.sh"
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "./package.sh \"$CI_NAME\" \"$CI_EMAIL\" $PKG_NAME $PKG_VERSION"
 
 # Copy the built package to the host machine,
 # so that other build jobs can use it.
