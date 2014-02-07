@@ -7,7 +7,5 @@ set -e
 export WORKSPACE=$HOME/validator
 
 cd $WORKSPACE
-git archive HEAD --output ../libvalidator0_0.9.orig.tar
-gzip ../libvalidator0_0.9.orig.tar
-debuild -us -uc --source-option=--include-binaries
 
+python packager.py "$CI_NAME" "$CI_EMAIL" $JOB_NAME 0.10
