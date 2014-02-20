@@ -8,7 +8,8 @@ set -e
 # - GITURL
 # - BRANCH
 # - RAWGITURL
-# - LOCAL_PKG_DIR
+# - CI_NAME
+# - CI_EMAIL
 
 echo "Installing wget..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get install --yes --force-yes wget"
@@ -18,11 +19,12 @@ ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./build.sh"
 echo "Running build script..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "./build.sh $GITURL $BRANCH"
 
-echo "Deploying packaging script..."
+echo "Deploying packaging scripts..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/validator/package.sh"
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/packager.py"
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./package.sh"
 echo "Creating packages..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "./package.sh \"$CI_NAME\" \"$CI_EMAIL\" $PKG_NAME $PKG_VERSION"
+ssh ubuntu@$IP -oStrictHostKeyChecking=no "./package.sh \"$CI_NAME\" \"$CI_EMAIL\" $PPA"
 
 # Copy the built package to the host machine,
 # so that other build jobs can use it.
