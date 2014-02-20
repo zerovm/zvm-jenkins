@@ -10,6 +10,7 @@ set -e
 # - RAWGITURL
 # - CI_NAME
 # - CI_EMAIL
+# - PPA
 
 echo "Installing wget..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get install --yes --force-yes wget"
@@ -23,10 +24,5 @@ echo "Deploying packaging scripts..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/validator/package.sh"
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/packager.py"
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./package.sh"
-echo "Creating packages..."
+echo "Creating and publishing packages to $PPA..."
 ssh ubuntu@$IP -oStrictHostKeyChecking=no "./package.sh \"$CI_NAME\" \"$CI_EMAIL\" $PPA"
-
-# Copy the built package to the host machine,
-# so that other build jobs can use it.
-# echo "Copying built deb package..."
-# scp ubuntu@$IP:/home/ubuntu/*.deb $LOCAL_PKG_DIR
