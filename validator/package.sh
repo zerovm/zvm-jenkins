@@ -13,5 +13,5 @@ export WORKSPACE=$HOME/validator
 cd $WORKSPACE
 
 # packager.py needs this for parsing the changelog
-sudo apt-get install python-debian
+sudo apt-get install --yes --force-yes python-debian
 python $HOME/packager.py "$CI_NAME" "$CI_EMAIL" $PPA
