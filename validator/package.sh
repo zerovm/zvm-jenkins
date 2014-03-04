@@ -6,11 +6,12 @@ set -e
 
 CI_NAME=$1
 CI_EMAIL=$2
-PKG_NAME=$3
-PKG_VERSION=$4
+PPA=$3
 
 export WORKSPACE=$HOME/validator
 
 cd $WORKSPACE
 
-python packager.py "$CI_NAME" "$CI_EMAIL" $PKG_NAME $PKG_VERSION
+# packager.py needs this for parsing the changelog
+sudo apt-get install python-debian
+python $HOME/packager.py "$CI_NAME" "$CI_EMAIL" $PPA
