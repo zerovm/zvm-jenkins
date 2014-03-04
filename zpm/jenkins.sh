@@ -16,6 +16,5 @@ lxc_run sudo apt-get install --yes --force-yes wget
 
 echo "Deploying build script..."
 lxc_run wget $RAWGITURL/zvm-jenkins/master/zpm/build.sh
-lxc_run chmod +x ./build.sh
 echo "Running build script..."
-lxc_run ./build.sh $GITURL $BRANCH
+lxc_run sh build.sh $GITURL $BRANCH

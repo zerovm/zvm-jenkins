@@ -18,13 +18,11 @@ echo "Installing wget..."
 lxc_run sudo apt-get install --yes --force-yes wget
 echo "Deploying build script..."
 lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/validator/build.sh
-lxc_run chmod +x ./build.sh
 echo "Running build script..."
-lxc_run ./build.sh $GITURL $BRANCH
+lxc_run sh build.sh $GITURL $BRANCH
 
 echo "Deploying packaging scripts..."
 lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/validator/package.sh
 lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/packager.py
-lxc_run chmod +x ./package.sh
 echo "Creating packages..."
-lxc_run ./package.sh "$CI_NAME" "$CI_EMAIL"
+lxc_run sh package.sh "$CI_NAME" "$CI_EMAIL"

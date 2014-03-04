@@ -23,9 +23,8 @@ done
 
 echo "Deploying build script..."
 lxc_run wget $RAWGITURL/zvm-jenkins/master/toolchain/build.sh
-lxc_run chmod +x ./build.sh
 echo "Running build script. This could take a while..."
-lxc_run ./build.sh $GITURL $BRANCH $REMOTE_PKG_REPO_DIR
+lxc_run sh build.sh $GITURL $BRANCH $REMOTE_PKG_REPO_DIR
 
 # TODO: deploy/run test script
 # TODO: deploy/run package script
