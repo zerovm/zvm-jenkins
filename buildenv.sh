@@ -12,6 +12,47 @@ LXC_TEMPLATE="zvm"
 # - RAWGITURL
 
 CURRENT_JOB_ID=$JOB_NAME-$BUILD_NUMBER
+IP=""
+
+# Try to scrape the IP from the leases file.
+do_get_ip () {
+    export IP=`cat /var/lib/misc/dnsmasq.leases | grep "\s$CURRENT_JOB_ID\s" | awk '{print $3}'`
+}
+
+# Attempt to get the IP of the lxc instance. If successful, bind it to the `IP`
+# env var
+get_ip () {
+    if [ -z "${IP}" ]; then
+        # it may take some time for the IP lease to take effect,
+        # so we can try multiple times before failing
+        times=(1 2 4 8 16)
+        for t in "${times[@]}"; do
+            echo "No IP yet assigned to LXC $CURRENT_JOB_ID -- waiting for $t seconds"
+            sleep $t
+            do_get_ip
+            if [ -z "${IP}" ]; then
+                # not yet defined
+                continue
+            else
+                break
+            fi
+        done
+    fi
+
+    if [ -z "${IP}" ]; then
+        echo "The LXC has did not get an IP"
+        exit 1
+    fi
+}
+
+# Run a command remotely on an lxc instance
+lxc_run () {
+    sudo lxc-attach -n $CURRENT_JOB_ID -- "$*"
+}
+
+lxc_scp () {
+    scp -oStrictHostKeyChecking=no "$*"
+}
 
 # clone an lxc container
 sudo lxc-clone -o $LXC_TEMPLATE -n $CURRENT_JOB_ID
