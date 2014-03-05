@@ -18,7 +18,6 @@ echo "Running build script..."
 lxc_run sh build.sh $GITURL $BRANCH
 
 echo "Grabbing test and coverage reports..."
-get_ip
 lxc_scp ubuntu@$IP:/home/ubuntu/zerovm-cli/junit.xml ./junit.xml
 lxc_scp -r ubuntu@$IP:/home/ubuntu/zerovm-cli/htmlcov ./
 
