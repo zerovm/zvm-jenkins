@@ -4,7 +4,6 @@ set -e
 # run the build script remotely in the LXC
 # TODO: Add a real check for these
 # The following env vars should be set:
-# - IP
 # - GITURL
 # - BRANCH
 # - RAWGITURL
@@ -12,21 +11,22 @@ set -e
 # - CI_EMAIL
 # - PPA
 
+lxc_run () {
+    sudo lxc-attach -n $JOB_NAME-$BUILD_NUMBER -- "$*"
+}
 
 echo "Installing wget..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get install --yes --force-yes wget"
+lxc_run sudo apt-get install --yes --force-yes wget
 
 echo "Deploying build script..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/zerovm/build.sh"
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./build.sh"
+lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/zerovm/build.sh
 
 echo "Running build script..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "./build.sh $GITURL $BRANCH"
+lxc_run sh build.sh $GITURL $BRANCH
 
 echo "Deploying packaging script..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/zerovm/package.sh"
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/packager.py"
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./package.sh"
+lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/zerovm/package.sh
+lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/packager.py
 
 echo "Creating and publishing packages..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "./package.sh \"$CI_NAME\" \"$CI_EMAIL\" $PPA"
+lxc_run sh package.sh "$CI_NAME" "$CI_EMAIL" $PPA

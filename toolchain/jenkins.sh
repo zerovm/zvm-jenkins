@@ -2,25 +2,29 @@
 set -x
 set -e
 # The following variables need to be set:
-# - IP
 # - GITURL
 # - RAWGITURL
 # - LOCAL_PKG_DIR
 # - REMOTE_PKG_REPO_DIR
 
+lxc_run () {
+    sudo lxc-attach -n $JOB_NAME-$BUILD_NUMBER -- "$*"
+}
 
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get update"
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "sudo apt-get install --yes --force-yes wget"
+lxc_run sudo apt-get update
+lxc_run sudo apt-get install --yes --force-yes wget
 
 echo "Deploying packages..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "mkdir $REMOTE_PKG_REPO_DIR"
-scp -oStrictHostKeyChecking=no $LOCAL_PKG_DIR/*.deb ubuntu@$IP:$REMOTE_PKG_REPO_DIR
+# TODO: simply move the packages into the rootfs on the host.
+lxc_run mkdir $REMOTE_PKG_REPO_DIR
+for f in $LOCAL_PKG_DIR/*.deb; do
+    lxc_run sh -c "cat > $REMOTE_PKG_REPO_DIR/$(basename $f)" < $f
+done
 
 echo "Deploying build script..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "wget $RAWGITURL/zvm-jenkins/master/toolchain/build.sh"
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "chmod +x ./build.sh"
+lxc_run wget $RAWGITURL/zvm-jenkins/master/toolchain/build.sh
 echo "Running build script. This could take a while..."
-ssh ubuntu@$IP -oStrictHostKeyChecking=no "./build.sh $GITURL $BRANCH $REMOTE_PKG_REPO_DIR"
+lxc_run sh build.sh $GITURL $BRANCH $REMOTE_PKG_REPO_DIR
 
 # TODO: deploy/run test script
 # TODO: deploy/run package script
