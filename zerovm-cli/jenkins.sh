@@ -1,28 +1,33 @@
 #!/bin/bash
 set -x
 set -e
-# run the build script remotely in the LXC
 # The following env vars should be set:
-# - GITURL
+# - GIT_ORG_URL
+# - GIT_PROJECT
 # - BRANCH
-# - RAWGITURL
+# - RAW_GIT_ORG_URL
 # - CI_NAME
 # - CI_EMAIL
+# - PPA (optional)
+
+source buildenv.sh
 
 echo "Installing wget..."
 lxc_run sudo apt-get install --yes --force-yes wget
-
 echo "Deploying build script..."
-lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/zpm/build.sh
+lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/$GIT_PROJECT/build.sh
 echo "Running build script..."
-lxc_run sh build.sh $GITURL $BRANCH
+lxc_run sh build.sh $GIT_ORG_URL $BRANCH
 
 echo "Grabbing test and coverage reports..."
 lxc_scp ubuntu@$IP:/home/ubuntu/zerovm-cli/junit.xml ./junit.xml
 lxc_scp -r ubuntu@$IP:/home/ubuntu/zerovm-cli/htmlcov ./
 
 echo "Deploying packaging scripts..."
-lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/zerovm-cli/package.sh
-lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/packager.py
-echo "Creating packges..."
-lxc_run sh package.sh "$CI_NAME" "$CI_EMAIL"
+lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/$GIT_PROJECT/package.sh
+lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/packager.py
+echo "Creating packages..."
+if [ -n "${PPA}" ]; then
+    echo "Publishing packages to $PPA..."
+fi
+lxc_run sh package.sh "$CI_NAME" "$CI_EMAIL" $PPA

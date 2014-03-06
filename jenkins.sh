@@ -2,9 +2,10 @@
 set -x
 set -e
 # The following env vars should be set:
-# - GITURL
+# - GIT_ORG_URL
+# - GIT_PROJECT
 # - BRANCH
-# - RAWGITURL
+# - RAW_GIT_ORG_URL
 # - CI_NAME
 # - CI_EMAIL
 # - PPA (optional)
@@ -14,13 +15,13 @@ source buildenv.sh
 echo "Installing wget..."
 lxc_run sudo apt-get install --yes --force-yes wget
 echo "Deploying build script..."
-lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/$JOB_NAME/build.sh
+lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/$GIT_PROJECT/build.sh
 echo "Running build script..."
-lxc_run sh build.sh $GITURL $BRANCH
+lxc_run sh build.sh $GIT_ORG_URL $BRANCH
 
 echo "Deploying packaging scripts..."
-lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/$JOB_NAME/package.sh
-lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/packager.py
+lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/$GIT_PROJECT/package.sh
+lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/packager.py
 echo "Creating packages..."
 if [ -n "${PPA}" ]; then
     echo "Publishing packages to $PPA..."
