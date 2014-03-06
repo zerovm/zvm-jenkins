@@ -19,15 +19,11 @@ lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/$GIT_PRO
 echo "Running build script..."
 lxc_run sh build.sh $GIT_ORG_URL $BRANCH
 
-echo "Grabbing test and coverage reports..."
-lxc_scp ubuntu@$IP:/home/ubuntu/zerovm-cli/junit.xml ./junit.xml
-lxc_scp -r ubuntu@$IP:/home/ubuntu/zerovm-cli/htmlcov ./
-
 echo "Deploying packaging scripts..."
-lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/$GIT_PROJECT/package.sh
+lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/package.sh
 lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/packager.py
 echo "Creating packages..."
 if [ -n "${PPA}" ]; then
     echo "Publishing packages to $PPA..."
 fi
-lxc_run sh package.sh "$CI_NAME" "$CI_EMAIL" $PPA
+lxc_run sh package.sh "$CI_NAME" "$CI_EMAIL" $GIT_PROJECT $PPA

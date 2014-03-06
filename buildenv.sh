@@ -40,14 +40,14 @@ get_ip () {
     fi
 
     if [ -z "${IP}" ]; then
-        echo "The LXC has did not get an IP"
+        echo "The LXC '$CURRENT_JOB_ID' did not get an IP"
         exit 1
     fi
 }
 
 # Run a command remotely on an lxc instance
 lxc_run () {
-    sudo lxc-attach -n $CURRENT_JOB_ID -- "$*"
+    ssh ubuntu@$IP -oStrictHostKeyChecking=no $*
 }
 
 lxc_scp () {
@@ -58,3 +58,5 @@ lxc_scp () {
 sudo lxc-clone -o $LXC_TEMPLATE -n $CURRENT_JOB_ID
 # start lxc, daemonized
 sudo lxc-start -n $CURRENT_JOB_ID -d
+
+get_ip

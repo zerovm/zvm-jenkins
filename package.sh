@@ -6,9 +6,8 @@ set -e
 
 CI_NAME=$1
 CI_EMAIL=$2
-PPA=$3
-
-export WORKSPACE=$HOME/validator
+WORKSPACE=$HOME/$3  # $3 if the GIT_PROJECT jenkins job var
+PPA=$4
 
 cd $WORKSPACE
 
