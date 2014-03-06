@@ -40,7 +40,7 @@ get_ip () {
     fi
 
     if [ -z "${IP}" ]; then
-        echo "The LXC has did not get an IP"
+        echo "The LXC '$CURRENT_JOB_ID' did not get an IP"
         exit 1
     fi
 }
