@@ -20,10 +20,10 @@ echo "Running build script..."
 lxc_run sh build.sh $GIT_ORG_URL $BRANCH
 
 echo "Deploying packaging scripts..."
-lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/$GIT_PROJECT/package.sh
+lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/package.sh
 lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/packager.py
 echo "Creating packages..."
 if [ -n "${PPA}" ]; then
     echo "Publishing packages to $PPA..."
 fi
-lxc_run sh package.sh "$CI_NAME" "$CI_EMAIL" $PPA
+lxc_run sh package.sh "$CI_NAME" "$CI_EMAIL" $GIT_PROJECT $PPA
