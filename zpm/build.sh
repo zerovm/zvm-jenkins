@@ -10,7 +10,9 @@ sudo apt-get update
 sudo apt-get install --yes --force-yes python-pip
 sudo pip install tox
 
-# Clone and build
-git clone -b $BRANCH $GITURL/zpm.git $WORKSPACE
+git clone $GITURL/zpm.git
 cd $WORKSPACE
+git fetch origin +refs/pull/*:refs/remotes/origin/pr/*
+git checkout $BRANCH
+
 tox

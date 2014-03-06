@@ -10,7 +10,9 @@ sudo apt-get update
 sudo apt-get install --yes --force-yes python-pip
 sudo pip install tox
 
-# Clone and build
-git clone -b $BRANCH $GITURL/zerovm-cli.git $WORKSPACE
+git clone $GITURL/zerovm-cli.git $WORKSPACE
 cd $WORKSPACE
+git fetch origin +refs/pull/*:refs/remotes/origin/pr/*
+git checkout $BRANCH
+
 tox -e py27,py3,pep8,pyflakes,full
