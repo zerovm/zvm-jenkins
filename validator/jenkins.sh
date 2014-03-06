@@ -20,4 +20,7 @@ echo "Deploying packaging scripts..."
 lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/validator/package.sh
 lxc_run wget --no-check-certificate $RAWGITURL/zvm-jenkins/master/packager.py
 echo "Creating packages..."
-lxc_run sh package.sh "$CI_NAME" "$CI_EMAIL"
+if [ -n "${PPA}" ]; then
+    echo "Publishing packages to $PPA..."
+fi
+lxc_run sh package.sh "$CI_NAME" "$CI_EMAIL" $PPA
