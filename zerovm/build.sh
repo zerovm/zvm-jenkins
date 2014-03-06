@@ -15,7 +15,9 @@ sudo add-apt-repository ppa:zerovm-ci/zerovm-latest
 sudo apt-get update
 sudo apt-get install --yes --force-yes $DEPS
 
-git clone -b $BRANCH $GITURL/zerovm.git $WORKSPACE
-
+git clone $GITURL/zerovm.git $WORKSPACE
 cd $WORKSPACE
+git fetch origin +refs/pull/*:refs/remotes/origin/pr/*
+git checkout $BRANCH
+
 make all
