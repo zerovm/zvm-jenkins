@@ -7,10 +7,6 @@ set -e
 # - BRANCH
 # - RAWGITURL
 
-lxc_run () {
-    sudo lxc-attach -n $JOB_NAME-$BUILD_NUMBER -- "$*"
-}
-
 echo "Installing wget..."
 lxc_run sudo apt-get install --yes --force-yes wget
 
