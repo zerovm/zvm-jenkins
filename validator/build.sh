@@ -15,4 +15,7 @@ cd $WORKSPACE
 git fetch origin +refs/pull/*:refs/remotes/origin/pr/*
 git checkout $BRANCH
 
-make validator
+./autogen.sh
+./configure
+make
+make clean
