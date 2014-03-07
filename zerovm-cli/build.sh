@@ -7,7 +7,7 @@ export GITURL=$1
 export BRANCH=$2
 
 sudo apt-get update
-sudo apt-get install --yes --force-yes python-pip
+sudo apt-get install --yes --force-yes python-pip python3
 sudo pip install tox
 
 git clone $GITURL/zerovm-cli.git $WORKSPACE
