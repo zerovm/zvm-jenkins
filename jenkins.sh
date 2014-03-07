@@ -13,6 +13,7 @@ set -e
 source buildenv.sh
 
 echo "Installing wget and git..."
+lxc_run sudo apt-get update
 lxc_run sudo apt-get install --yes --force-yes wget git
 echo "Deploying build script..."
 lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/$GIT_PROJECT/build.sh
