@@ -13,4 +13,4 @@ cd $WORKSPACE
 
 # packager.py needs this for parsing the changelog
 sudo apt-get install --yes --force-yes python-debian
-python $HOME/packager.py "$CI_NAME" "$CI_EMAIL" $PPA
+python $HOME/packager.py "$CI_NAME" $CI_EMAIL $PPA
