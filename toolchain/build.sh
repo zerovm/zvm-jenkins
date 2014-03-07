@@ -1,45 +1,57 @@
 #!/bin/bash
-# Jenkins build/test script for the zvm-toolchain
-# See $GITURL/toolchain
 set -x
 set -e
 
-export WORKSPACE=$HOME/zvm-toolchain  # Root working directory
-export GITURL=$1                      # example: "$GITURL"
-export TOOLCHAIN_BRANCH=$2            # branch of the toolchain to build
-export REMOTE_PKG_REPO_DIR=$3
+export WORKSPACE=$HOME/toolchain
+export GITURL=$1
+export BRANCH=$2
 
-sudo apt-get update
-sudo apt-get install --yes --force-yes dpkg-dev
+export ZRT_ROOT=$HOME/zrt
+export ZVM_PREFIX=$HOME/zvm-root
+export LD_LIBRARY_PATH=/usr/lib64
+export CPATH=/usr/x86_64-nacl/include
 
-echo "deb file:$REMOTE_PKG_REPO_DIR ./" | sudo tee -a /etc/apt/sources.list
-cd $REMOTE_PKG_REPO_DIR
-dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
-sudo apt-get update
-# We need to install this first before adding the ZVM repo,
-# so that we can install the local/latest version
-sudo apt-get install --yes --force-yes zerovm-zmq zerovm-zmq-dev
-sudo su -c 'echo "deb [ arch=amd64 ] http://zvm.rackspace.com/v1/repo/ubuntu/ precise main" > /etc/apt/sources.list.d/zerovm-precise.list'
-wget -O- https://zvm.rackspace.com/v1/repo/ubuntu/zerovm.pkg.key | sudo apt-key add -
-sudo apt-get update
+# Toolchain sublibs
+TC_LIBS="linux-headers-for-nacl gcc glibc newlib binutils"
 
-# install package deps
 DEPS="git libc6-dev-i386 libglib2.0-dev pkg-config build-essential automake"
 DEPS="$DEPS autoconf libtool g++-multilib texinfo flex bison groff gperf"
-DEPS="$DEPS texinfo subversion libzmq3 libzmq3-dev"
+DEPS="$DEPS texinfo subversion libzmq3 libzmq3-dev zerovm-zmq zerovm-zmq-dev"
+
+sudo apt-get update
+sudo apt-get install --yes --force-yes python-software-properties
+sudo add-apt-repository ppa:zerovm-ci/zerovm-latest
+sudo apt-get update
 sudo apt-get install --yes --force-yes $DEPS
 
-# we need zrt to build the toolchain
-export ZRT_ROOT=$HOME/zrt
+# we need zrt to build the toolchain as well:
 git clone $GITURL/zrt.git $ZRT_ROOT
-# Pull the main source repo:
-git clone -b $TOOLCHAIN_BRANCH $GITURL/toolchain.git $WORKSPACE
+
+git clone $GITURL/toolchain.git $WORKSPACE
+
 cd $WORKSPACE/SRC
-git clone $GITURL/linux-headers-for-nacl.git
-git clone $GITURL/gcc.git
-git clone $GITURL/glibc.git
-git clone $GITURL/newlib.git
-git clone $GITURL/binutils.git
+for lib in $TC_LIBS; do
+    git clone $GITURL/$lib.git
+done
+
 cd $WORKSPACE
-echo "Building toolchain..."
-make -j8
+git fetch origin +refs/pull/*:refs/remotes/origin/pr/*
+git checkout $BRANCH
+
+echo "Building toolchain. This could take a while..."
+make -j8 ZEROVM=`which zerovm`
+
+# Clean build artifacts before we continue to packaging:
+for lib in $TC_LIBS; do
+    cd $WORKSPACE/SRC/$lib
+    git reset --hard
+    git clean -fd
+done
+
+# Set the ZRT_ROOT up for packaging by prepending the var to bashrc.
+# It needs to be _before_ the `[ -z "$PS1" ] && return`.
+# See http://stackoverflow.com/questions/940533/how-do-i-set-path-such-that-ssh-userhost-command-works/941995#941995.
+RND_TMP_FILE=/tmp/$RANDOM
+echo "export ZRT_ROOT=$ZRT_ROOT" >> $RND_TMP_FILE
+cat ~/.bashrc >> $RND_TMP_FILE
+cp $RND_TMP_FILE ~/.bashrc
