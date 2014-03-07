@@ -47,7 +47,11 @@ get_ip () {
 
 # Run a command remotely on an lxc instance
 lxc_run () {
-    ssh ubuntu@$IP -oStrictHostKeyChecking=no $*
+    # SSH takes its positional arguments, joins them with space and
+    # passes that to a shell on the remote host. The shell will remove
+    # one level of quoting, so we need to add this here while we still
+    # have the positional arguments in their original form.
+    ssh ubuntu@$IP -oStrictHostKeyChecking=no $(printf "%q " "$@")
 }
 
 lxc_scp () {
