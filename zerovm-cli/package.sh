@@ -18,4 +18,4 @@ sudo apt-get install --yes --force-yes python-debian
 # We need a pristine environment for packaging.
 # Things like .tox/ .coverage, etc. will make debuild unhappy
 git clean -fdX
-python $HOME/packager.py "$CI_NAME" "$CI_EMAIL" $PPA
+python $HOME/packager.py "$CI_NAME" $CI_EMAIL $PPA
