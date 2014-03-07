@@ -8,7 +8,7 @@ CI_NAME=$1
 CI_EMAIL=$2
 PPA=$3
 
-export WORKSPACE=$HOME/validator
+export WORKSPACE=$HOME/zerovm-cli
 
 cd $WORKSPACE
 
