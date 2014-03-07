@@ -55,7 +55,7 @@ lxc_run () {
 }
 
 lxc_scp () {
-    scp -oStrictHostKeyChecking=no "$*"
+    scp -oStrictHostKeyChecking=no $*
 }
 
 # clone an lxc container
