@@ -48,10 +48,5 @@ for lib in $TC_LIBS; do
     git clean -fd
 done
 
-# Set the ZRT_ROOT up for packaging by prepending the var to bashrc.
-# It needs to be _before_ the `[ -z "$PS1" ] && return`.
-# See http://stackoverflow.com/questions/940533/how-do-i-set-path-such-that-ssh-userhost-command-works/941995#941995.
-RND_TMP_FILE=/tmp/$RANDOM
-echo "export ZRT_ROOT=$ZRT_ROOT" >> $RND_TMP_FILE
-cat ~/.bashrc >> $RND_TMP_FILE
-cp $RND_TMP_FILE ~/.bashrc
+# Make ZRT_ROOT available for generic package.sh script.
+echo "export ZRT_ROOT=$ZRT_ROOT" > ~/.bashrc
