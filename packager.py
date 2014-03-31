@@ -49,7 +49,8 @@ def _create_package(pkg_name, version, short_hash, now):
     )
     src_pkg_file = pkg_file % dict(suffix='_source.changes')
 
-    archive = ('tar czf ../%(tar)s * --exclude=debian')
+    archive = ('tar czf ../%(tar)s * .* --exclude=.git* --exclude=.. '
+               '--exclude=debian')
     archive %= dict(tar=tar_name)
     _sp_run(archive)
 
