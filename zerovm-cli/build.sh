@@ -15,4 +15,4 @@ cd $WORKSPACE
 git fetch origin +refs/pull/*:refs/remotes/origin/pr/*
 git checkout $BRANCH
 
-tox -e py27,py3,pep8,pyflakes,full
+tox
