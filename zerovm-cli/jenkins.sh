@@ -21,8 +21,11 @@ echo "Running build script..."
 lxc_run sh build.sh $GIT_ORG_URL $BRANCH
 
 echo "Grabbing test and coverage reports..."
-lxc_scp ubuntu@$IP:/home/ubuntu/zerovm-cli/junit.xml ./junit.xml
-lxc_scp -r ubuntu@$IP:/home/ubuntu/zerovm-cli/htmlcov ./
+# Remote workding dir
+REMOTE_WD="/home/ubuntu/zerovm-cli"
+lxc_scp ubuntu@$IP:$REMOTE_WD/junit.xml ./junit.xml
+lxc_scp -r ubuntu@$IP:$REMOTE_WD/htmlcov ./
+lxc_scp ubuntu@$IP:$REMOTE_WD/coverage.xml ./coverage.xml
 
 echo "Deploying packaging scripts..."
 lxc_run wget --no-check-certificate $RAW_GIT_ORG_URL/zvm-jenkins/master/$GIT_PROJECT/package.sh
