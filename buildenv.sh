@@ -54,10 +54,6 @@ lxc_run () {
     ssh ubuntu@$IP -oStrictHostKeyChecking=no $(printf "%q " "$@")
 }
 
-lxc_scp () {
-    scp -oStrictHostKeyChecking=no $*
-}
-
 # clone an lxc container
 sudo lxc-clone -o $LXC_TEMPLATE -n $CURRENT_JOB_ID
 # start lxc, daemonized
