@@ -12,7 +12,7 @@ LXC_TEMPLATE="zvm"
 # - RAWGITURL
 
 CURRENT_JOB_ID=$JOB_NAME-$BUILD_NUMBER
-IP=""
+IP="-"
 
 do_get_ip () {
     export IP=`sudo lxc-ls --fancy --fancy-format=name,ipv4 | grep "^$CURRENT_JOB_ID\s" | awk '{print $2}'`
@@ -21,7 +21,7 @@ do_get_ip () {
 # Attempt to get the IP of the lxc instance. If successful, bind it to the `IP`
 # env var
 get_ip () {
-    if [ -z "${IP}" ]; then
+    if [ $IP = "-" ]; then
         # it may take some time for the IP lease to take effect,
         # so we can try multiple times before failing
         times=(1 2 4 8 16)
