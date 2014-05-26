@@ -12,5 +12,5 @@ PPA=$4
 cd $WORKSPACE
 
 # packager.py needs this for parsing the changelog
-sudo apt-get install --yes --force-yes python-debian
+sudo apt-get install --yes --force-yes python-debian debhelper devscripts
 python $HOME/packager.py "$CI_NAME" $CI_EMAIL $PPA
