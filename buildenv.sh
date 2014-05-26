@@ -29,7 +29,7 @@ get_ip () {
             echo "No IP yet assigned to LXC $CURRENT_JOB_ID -- waiting for $t seconds"
             sleep $t
             do_get_ip
-            if [ -z "${IP}" ]; then
+            if [ $IP = "-" ]; then
                 # not yet defined
                 continue
             else
@@ -38,7 +38,7 @@ get_ip () {
         done
     fi
 
-    if [ -z "${IP}" ]; then
+    if [ $IP = "-" ]; then
         echo "The LXC '$CURRENT_JOB_ID' did not get an IP"
         exit 1
     fi
