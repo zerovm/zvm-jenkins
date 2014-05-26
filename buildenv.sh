@@ -14,9 +14,8 @@ LXC_TEMPLATE="zvm"
 CURRENT_JOB_ID=$JOB_NAME-$BUILD_NUMBER
 IP=""
 
-# Try to scrape the IP from the leases file.
 do_get_ip () {
-    export IP=`cat /var/lib/misc/dnsmasq.leases | grep "\s$CURRENT_JOB_ID\s" | awk '{print $3}'`
+    export IP=`sudo lxc-ls --fancy --fancy-format=name,ipv4 | grep "^$CURRENT_JOB_ID\s" | awk '{print $2}'`
 }
 
 # Attempt to get the IP of the lxc instance. If successful, bind it to the `IP`
